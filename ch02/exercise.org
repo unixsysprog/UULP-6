@@ -1,0 +1,134 @@
+* CH02
+** 2.1
+   /proc
+** 2.2
+   /etc/rc.d/rc.sysinit
+#+BEGIN_SRC shell-script
+# Clean up utmp/wtmp
+> /var/run/utmp
+touch /var/log/wtmp
+chgrp utmp /var/run/utmp /var/log/wtmp
+chmod 0664 /var/run/utmp /var/log/wtmp
+if [ -n "$_NEED_XFILES" ]; then
+  > /var/run/utmpx
+  touch /var/log/wtmpx
+  chgrp utmp /var/run/utmpx /var/log/wtmpx
+  chmod 0664 /var/run/utmpx /var/log/wtmpx
+fi
+[ -n "$SELINUX_STATE" ] && restorecon /var/run/utmp* /var/log/wtmp* >/dev/null 2>&1
+#+END_SRC
+
+** 2.4
+   /usr/include/libio.h
+#+BEGIN_SRC shell-script
+struct _IO_FILE {
+  int _flags;           /* High-order word is _IO_MAGIC; rest is flags. */
+#define _IO_file_flags _flags
+
+  /* The following pointers correspond to the C++ streambuf protocol. */
+  /* Note:  Tk uses the _IO_read_ptr and _IO_read_end fields directly. */
+  char* _IO_read_ptr;   /* Current read pointer */
+  char* _IO_read_end;   /* End of get area. */
+  char* _IO_read_base;  /* Start of putback+get area. */
+  char* _IO_write_base; /* Start of put area. */
+  char* _IO_write_ptr;  /* Current put pointer. */
+  char* _IO_write_end;  /* End of put area. */
+  char* _IO_buf_base;   /* Start of reserve area. */
+  char* _IO_buf_end;    /* End of reserve area. */
+  /* The following fields are used to support backing up and undo. */
+  char *_IO_save_base; /* Pointer to start of non-current get area. */
+  char *_IO_backup_base;  /* Pointer to first valid character of backup area */
+  char *_IO_save_end; /* Pointer to end of non-current get area. */
+
+  struct _IO_marker *_markers;
+
+  struct _IO_FILE *_chain;
+
+  int _fileno;
+#if 0
+  int _blksize;
+#else
+  int _flags2;
+#endif
+  _IO_off_t _old_offset; /* This used to be _offset but it's too small.  */
+
+#define __HAVE_COLUMN /* temporary */
+  /* 1+column number of pbase(); 0 is unknown. */
+  unsigned short _cur_column;
+  signed char _vtable_offset;
+  char _shortbuf[1];
+
+  /*  char* _save_gptr;  char* _save_egptr; */
+
+  _IO_lock_t *_lock;
+#ifdef _IO_USE_OLD_IO_FILE
+};
+#+END_SRC
+
+** 2.5
+#+BEGIN_SRC text
+NAME
+       fsync, fdatasync - synchronize a file’s in-core state with storage device
+
+SYNOPSIS
+       #include <unistd.h>
+
+       int fsync(int fd);
+
+       int fdatasync(int fd);
+
+   Feature Test Macro Requirements for glibc (see feature_test_macros(7)):
+
+       fsync(): _BSD_SOURCE || _XOPEN_SOURCE
+                || /* since glibc 2.8: */ _POSIX_C_SOURCE >= 200112L
+       fdatasync(): _POSIX_C_SOURCE >= 199309L || _XOPEN_SOURCE >= 500
+
+DESCRIPTION
+       fsync()  transfers  ("flushes") all modified in-core data of (i.e., modified
+       buffer cache pages for) the file referred to by the file  descriptor  fd  to
+       the disk device (or other permanent storage device) where that file resides.
+       The call blocks until the device reports that the  transfer  has  completed.
+       It also flushes metadata information associated with the file (see stat(2)).
+
+       Calling fsync() does not necessarily ensure that the entry in the  directory
+       containing  the file has also reached disk.  For that an explicit fsync() on
+       a file descriptor for the directory is also needed.
+
+       fdatasync() is similar to fsync(), but  does  not  flush  modified  metadata
+       unless that metadata is needed in order to allow a subsequent data retrieval
+       to be correctly handled.  For  example,  changes  to  st_atime  or  st_mtime
+       (respectively,  time  of  last  access  and  time  of last modification; see
+       stat(2)) do not require flushing because they are not necessary for a subse-
+       quent data read to be handled correctly.  On the other hand, a change to the
+       file size (st_size, as made by say ftruncate(2)), would require  a  metadata
+       flush.
+
+       The  aim  of fdatasync() is to reduce disk activity for applications that do
+       not require all metadata to be synchronized with the disk.
+#+END_SRC
+
+** 2.7
+   man man
+#+BEGIN_SRC text
+MANUAL SECTIONS
+       The standard sections of the manual include:
+
+       1      User Commands
+
+       2      System Calls
+
+       3      C Library Functions
+
+       4      Devices and Special Files
+
+       5      File Formats and Conventions
+
+       6      Games et. Al.
+
+       7      Miscellanea
+
+       8      System Administration tools and Deamons
+
+       Distributions customize the manual section to their specifics,  which  often
+       include additional sections.
+#+END_SRC
